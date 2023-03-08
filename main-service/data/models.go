@@ -35,8 +35,8 @@ type ImportHistory struct {
 
 type MessageTemplate struct {
   Id int `gorm:"primaryKey"`
-  StaffNum   int
-  TemplateType string `gorm:"default:S"`
+  StaffId   string
+  TemplateType string 
   TemplateName string
   Subject string
   MessagesJson string
@@ -47,7 +47,7 @@ type MessageTemplate struct {
 
 type APIMessageTemplate struct {
   Id int `json:"templateId"`
-  StaffNum   int `json:"staffNum"`
+  StaffId   string `json:"staffId"`
   TemplateType string `json:"templateType"`
   TemplateName string `json:"name"`
   Subject string `json:"subject"`
@@ -56,7 +56,7 @@ type APIMessageTemplate struct {
 
 type APIMessageTemplate2 struct {
   Id int `json:"templateId"`
-  StaffNum   int `json:"staffNum"`
+  StaffId   string `json:"staffId"`
   TemplateType string `json:"templateType"`
   TemplateName string `json:"name"`
   Subject string `json:"subject"`
@@ -226,7 +226,7 @@ func SaveImportData() {
 */
 func SaveMessageTemplate(tmpType string, tmpName string, tmpSubject string, messagesJson string, url string) {
   ConnectToDatabase()
-	template := []MessageTemplate{{StaffNum: 333, TemplateType: tmpType, TemplateName: tmpName, Subject: tmpSubject, MessagesJson: messagesJson, URL: url, CreatedAt: time.Now().Local()}}
+	template := []MessageTemplate{{StaffId: "333", TemplateType: tmpType, TemplateName: tmpName, Subject: tmpSubject, MessagesJson: messagesJson, URL: url, CreatedAt: time.Now().Local()}}
   db.Create(&template)
   Log.Info("created message template")
 }
@@ -239,7 +239,7 @@ func SaveMessageTemplate(tmpType string, tmpName string, tmpSubject string, mess
 */
 func UpdateMessageTemplate(id string,tmpType string, tmpName string, tmpSubject string, messagesJson string, url string) {
   ConnectToDatabase()
-  db.Model(&MessageTemplate{}).Where("id = ?", id).Updates(MessageTemplate{StaffNum: 333, TemplateType: tmpType, TemplateName: tmpName, Subject: tmpSubject, MessagesJson: messagesJson, URL: url, CreatedAt: time.Now().Local()})
+  db.Model(&MessageTemplate{}).Where("id = ?", id).Updates(MessageTemplate{StaffId: "333", TemplateType: tmpType, TemplateName: tmpName, Subject: tmpSubject, MessagesJson: messagesJson, URL: url, CreatedAt: time.Now().Local()})
   Log.Info("updated message template")
 }
 
