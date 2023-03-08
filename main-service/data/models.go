@@ -26,7 +26,7 @@ type ImportData struct {
 
 type ImportHistory struct {
   ImportId int `gorm:"primaryKey"`
-  StaffNum   int
+  StaffId   string
   Title   string
   Header string
   CreatedAt time.Time
@@ -124,7 +124,7 @@ type APIBulkMessageId struct {
 
 type APIImportHistory struct {
   ImportId int `json:"importId"`
-  StaffNum   int `json:"staffNum"`
+  StaffId   string `json:"staffId"`
   Title   string `json:"title"`
   CreatedAt time.Time `json:"createdAt"`
 }
@@ -179,7 +179,7 @@ func SaveImportHistory() {
   absPath, _ := filepath.Abs("../main-service/data/sample.sqlite")
   cols, _ := executeSqliteFile(absPath)
   header := fmt.Sprint(cols)
-	history := []ImportHistory{{StaffNum: 333, Title: "sample1", Header: header, CreatedAt: time.Now().Local()}}
+	history := []ImportHistory{{StaffId: "333", Title: "sample1", Header: header, CreatedAt: time.Now().Local()}}
   db.Create(&history)
   Log.Info("saved import history")
 }
