@@ -20,7 +20,7 @@ func makeDbConnection() *gorm.DB{
     time.Sleep(time.Duration(5000 * time.Millisecond))
 
 	dsn := "docker:docker@tcp(mysql_host:3306)/test_database?multiStatements=True&charset=utf8mb4&parseTime=True&loc=Local"
-	//dsn := "bulkmsg:xCu34REN8hqB6Ydh.@tcp(10.120.12.80:3306)/bulk_message"
+	//dsn := "bulkmsg:xCu34REN8hqB6Ydh.@tcp(10.120.12.80:3306)/bulk_message2"
 
 
 	sqlDB, error := sql.Open("mysql", dsn)
