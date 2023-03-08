@@ -71,8 +71,8 @@ type APITemplateId struct {
 
 type BulkMessage struct {
   BulkMessageId int `gorm:"primaryKey"`
-  StaffNum   int
-  BulkType   string `gorm:"default:0"`
+  StaffId   string
+  BulkType   string 
   ImportId string
   FilterJson   string
   Subject   string
@@ -84,7 +84,7 @@ type BulkMessage struct {
 
 type APIBulkMessage struct {
   BulkMessageId int `json:"bulkMessageId"`
-  StaffNum   int `json:"staffNum"`
+  StaffId   string `json:"staffId"`
   BulkType   string `json:"bulkType"`
   ImportId string `json:"importId"`
   FilterJson   string `json:"filterJson"`
@@ -95,7 +95,7 @@ type APIBulkMessage struct {
 
 type APIBulkMessage2 struct {
   BulkMessageId int `json:"bulkMessageId"`
-  StaffNum   int `json:"staffNum"`
+  StaffId   string `json:"staffId"`
   BulkType   string `json:"bulkType"`
   ImportId string `json:"importId"`
   FilterJson   string `json:"filterJson"`
@@ -370,7 +370,7 @@ func SaveBulkMessages(bulkType string, importId string, filterJson string, subje
   createMessageRequestBody(id, subject, url)
   makeMessageJson(line_num, importId, messageJson)
 
-	bulk_message := []BulkMessage{{StaffNum: 333, BulkType: bulkType, ImportId: importId, FilterJson: filterJson, Subject: subject, MessagesJson: messageJson, URL: url, CreatedAt: time.Now().Local()}}
+	bulk_message := []BulkMessage{{StaffId: "333", BulkType: bulkType, ImportId: importId, FilterJson: filterJson, Subject: subject, MessagesJson: messageJson, URL: url, CreatedAt: time.Now().Local()}}
   db.Create(&bulk_message)
   Log.Info("saved bulk message to the database")
 }
