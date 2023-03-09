@@ -1,13 +1,11 @@
 package data
 
 import (
-	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 /* function for add ca certificate
@@ -52,23 +50,6 @@ func addCaCertificate() http.Client{
 	return client
 }
 
-/* function for wait till the time
-   @param --> ctx, until
-   @param value --> Context Object, Time Object
-   description --> helper function for wait till the time
-   @return --> null
-*/
-func waitUntil(ctx context.Context, until time.Time) {
-	timer := time.NewTimer(time.Until(until))
-	defer timer.Stop()
-
-	select {
-	case <-timer.C:
-		return
-	case <-ctx.Done():
-		return
-	}
-}
 
 
 

@@ -13,5 +13,6 @@ import (
 func initializeService() {
 	data.MakeLogger()
    data.ConnectToDatabase()
+   data.DoLogin("install_11","install_11")
 }
 

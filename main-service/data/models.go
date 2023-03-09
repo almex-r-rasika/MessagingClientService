@@ -113,7 +113,7 @@ type BulkMessagesBox struct {
   Body string
   URL  string
   CreatedAt time.Time
-  SendAt sql.NullTime
+  SendAt time.Time
   DeletedAt sql.NullTime
   Status   string `gorm:"default:0"`
 }
@@ -138,6 +138,7 @@ var bulkMessageId APIBulkMessageId
 var bulkMessages []APIBulkMessage
 var bulkMessages2 []APIBulkMessage2
 var importHistoryObj ImportHistory
+var bulkMessageBox []BulkMessagesBox
 
 /* function for make a connection to the database
     @param --> null
@@ -357,23 +358,46 @@ func GetLastTemplate() (APITemplateId){
 */
 func SaveBulkMessages(bulkType string, importId string, filterJson string, subject string, messageJson string, url string) {
   ConnectToDatabase()
+  
+  bulk_message := []BulkMessage{{StaffId: "333", BulkType: bulkType, ImportId: importId, FilterJson: filterJson, Subject: subject, MessagesJson: messageJson, URL: url, CreatedAt: time.Now().Local()}}
+  db.Create(&bulk_message)
+  Log.Info("saved bulk message to the database")
 
   // get line no to find key value pair
   line_num := getLineNo(importId, filterJson)
-  id := getKeyValue(line_num, importId, "ID")
 
   // create subject with its key --> value
   _, subject_key := readSubject(subject)
   subject_value := getKeyValue(line_num, importId, subject_key)
   subject = makeSubject(subject, subject_value)
 
-  createMessageRequestBody(id, subject, url)
-  makeMessageJson(line_num, importId, messageJson)
+  message_json := makeMessageJson(line_num, importId, messageJson)
+  Log.Info(message_json)
 
-	bulk_message := []BulkMessage{{StaffId: "333", BulkType: bulkType, ImportId: importId, FilterJson: filterJson, Subject: subject, MessagesJson: messageJson, URL: url, CreatedAt: time.Now().Local()}}
-  db.Create(&bulk_message)
-  Log.Info("saved bulk message to the database")
+  // get loggin token 
+  token := logged_users["install_11"]
+
+  //get bulk message id
+  bulk_message_id := GetLastBulkMessageId().BulkMessageId
+
+  // send message to message controller
+  DoMessage(bulk_message_id, subject, message_json, url, token)
+
 }
+
+/* Save bulk message box to the database
+    @param --> null
+    @param value --> null
+    description --> save bulk messages to db
+    @return --> null
+*/
+func saveBulkMessagesBox(bulkMessageId int,JId string, subject string, body string, url string, status string) {
+  ConnectToDatabase()
+  bulk_message_box := []BulkMessagesBox{{BulkMessageId: bulkMessageId, JID: JId, Subject: subject, Body: body, URL: url, CreatedAt: time.Now().Local(), SendAt: time.Now().Local(), Status: status}}
+  db.Create(&bulk_message_box)
+  Log.Info("saved bulk message box to the database")
+}
+
 
 /* function for get last bulk message id
     @param --> null
