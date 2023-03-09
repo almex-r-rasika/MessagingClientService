@@ -37,14 +37,12 @@ type PatientDataRequestBody struct {
    description --> get patient list for given free word
    @return --> patient_list array
 */
-func GetPatientList(address string,token string) []string{
+func GetPatientList(token string) []string{
 
 	var person_list string
 
-	address_list := getFreewordAndRelationship(address)
-
 	requestBody := &PatientDataRequestBody{
-		FreeWord:       address_list[0],
+		FreeWord: "9999999991",
 	}
 
 	jsonString, err := json.Marshal(requestBody)
@@ -90,9 +88,7 @@ func GetPatientList(address string,token string) []string{
 
 	for _, p := range person{
         patient_num := p.PatientNum
-		if(p.Relationship == address_list[1]){
-			person_list = patient_num+" "+person_list
-		}
+		person_list = patient_num+" "+person_list
 	}
 
 	patient_list := strings.Fields(person_list)
@@ -106,14 +102,3 @@ func GetPatientList(address string,token string) []string{
 	return patient_list
 }
 
-/* function for get free-word and relationship from the message address
-   @param --> address
-   @param value --> message object's address field
-   description --> split address string to string array using , operator
-   @return --> string array 
-*/
-func getFreewordAndRelationship(address string) []string{
-
-	result := strings.Split(address, ",")
-	return result
-}
