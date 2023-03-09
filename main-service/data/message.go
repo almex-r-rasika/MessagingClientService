@@ -2,13 +2,10 @@ package data
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
-	"time"
 )
 
 type MessageRequestBody struct {
@@ -30,18 +27,15 @@ type Message struct {
    description --> for each message when the send time comes message will send to the destination
    @return --> Message Object
 */
-func DoMessage(messageId string,sendTime string,sendUserId string,address string,subject string,line1 string,line2 string,line3 string,line4 string,line5 string,line6 string,line7 string,line8 string,line9 string,line10 string,patientList []string, token string, count int) Message{
+func DoMessage(bulkMessageId int,subject string,messageJson string,url string,token string) Message{
 
-	var patients = patientList
-	subject = "[yuri-test] "+time.Now().Format("15:04:05")+" "+strconv.Itoa(count)+" "+subject
-
-	jsonbody := getMessageBody(line1, line2, line3, line4, line5, line6, line7, line8, line9, line10)
+	var patients = GetPatientList(token)
 
 	requestBody := &MessageRequestBody{
         PatientNumList: patients,
 		Subject: subject,
-		Body: jsonbody,
-		Url: "",
+		Body: messageJson,
+		Url: url,
     }
 
     jsonString, err := json.Marshal(requestBody)
@@ -62,15 +56,6 @@ func DoMessage(messageId string,sendTime string,sendUserId string,address string
 
 	// add CA Certificate
 	client := addCaCertificate()
-
-	// our context, we use context.Background()
-	ctx := context.Background()
-
-	// when we want to wait till
-	until, _ := time.Parse(time.RFC3339, sendTime)
-
-	// and now we are waiting till the send_time
-	waitUntil(ctx, until)
 
     response, err := client.Do(req)
     if err != nil {
@@ -93,51 +78,14 @@ func DoMessage(messageId string,sendTime string,sendUserId string,address string
 
    // validate the response
    if(message.Error == "0"){
-	Log.Info("user "+sendUserId+" sent message at "+sendTime)
+	Log.Info("user sent message")
    }else{
     Log.Error("error "+message.Error+" errorcode "+message.ErrorCode+" errorstring "+message.ErrorString)
    }
 
    // save send messages to the database
-   //SaveSendMessage(messageId,sendTime,sendUserId,address,subject,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,time.Now(),message.Error)
+   saveBulkMessagesBox(bulkMessageId, fmt.Sprint(patients), subject, messageJson, url, message.Error )
 
    return message
 }
-
-/* function for create message body for a message
-   @param --> null
-   @param value --> null
-   description --> create message body for DoMessage function
-   @return --> message body
-*/
-func getMessageBody(line1 string, line2 string, line3 string, line4 string, line5 string, line6 string, line7 string, line8 string, line9 string, line10 string) string{
-
-	jsonbody := fmt.Sprintf("[{\"index\":0,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":1,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":2,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":3,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":4,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":5,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":6,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":7,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":8,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":9,\"message\":\"%s\",\"color\":\"#000000\"},{\"index\":10,\"message\":\"\",\"color\":\"#000000\"},{\"index\":11,\"message\":\"\",\"color\":\"#000000\"},{\"index\":12,\"message\":\"\",\"color\":\"#000000\"},{\"index\":13,\"message\":\"\",\"color\":\"#000000\"},{\"index\":14,\"message\":\"\",\"color\":\"#000000\"},{\"index\":15,\"message\":\"\",\"color\":\"#000000\"},{\"index\":16,\"message\":\"\",\"color\":\"#000000\"},{\"index\":17,\"message\":\"\",\"color\":\"#000000\"},{\"index\":18,\"message\":\"\",\"color\":\"#000000\"},{\"index\":19,\"message\":\"\",\"color\":\"#000000\"},{\"index\":20,\"message\":\"\",\"color\":\"#000000\"},{\"index\":21,\"message\":\"\",\"color\":\"#000000\"},{\"index\":22,\"message\":\"\",\"color\":\"#000000\"},{\"index\":23,\"message\":\"\",\"color\":\"#000000\"},{\"index\":24,\"message\":\"\",\"color\":\"#000000\"},{\"index\":25,\"message\":\"\",\"color\":\"#000000\"},{\"index\":26,\"message\":\"\",\"color\":\"#000000\"},{\"index\":27,\"message\":\"\",\"color\":\"#000000\"},{\"index\":28,\"message\":\"\",\"color\":\"#000000\"},{\"index\":29,\"message\":\"\",\"color\":\"#000000\"}]",line1, line2, line3, line4, line5, line6, line7, line8, line9, line10)
-
-	return jsonbody
-}
-
-/* function for create message body for a message
-   @param --> ID
-   @param value --> null
-   description --> create message body for DoMessage function
-   @return --> message body
-*/
-
-func createMessageRequestBody(id string, subject string, url string) MessageRequestBody{
-
-    var patients []string
-	jsonbody := fmt.Sprintf("[{\"index\":0,\"message\":\"%s\",\"color\":\"#000000\"}]",id)
-
-    requestBody := &MessageRequestBody{
-        PatientNumList: patients,
-		Subject: subject,
-		Body: jsonbody,
-		Url: url,
-    }
-
-	return *requestBody
-
-}
-
 
