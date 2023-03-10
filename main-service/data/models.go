@@ -138,7 +138,6 @@ var bulkMessageId APIBulkMessageId
 var bulkMessages []APIBulkMessage
 var bulkMessages2 []APIBulkMessage2
 var importHistoryObj ImportHistory
-var bulkMessageBox []BulkMessagesBox
 
 /* function for make a connection to the database
     @param --> null
@@ -220,8 +219,8 @@ func SaveImportData() {
 }
 
 /* Save message template to the database
-    @param --> null
-    @param value --> null
+    @param --> templateType, templateName, templateSubject, messagejson, url
+    @param value --> string, string, string, string, string
     description --> save template to database
     @return --> null
 */
@@ -233,8 +232,8 @@ func SaveMessageTemplate(tmpType string, tmpName string, tmpSubject string, mess
 }
 
 /* Update message template to the database
-    @param --> null
-    @param value --> null
+    @param --> templateId, templateType, templateName, templateSubject, messageJson, url
+    @param value --> string, string, string, string, string, string
     description --> update template
     @return --> null
 */
@@ -245,8 +244,8 @@ func UpdateMessageTemplate(id string,tmpType string, tmpName string, tmpSubject 
 }
 
 /* Delete message template from the database
-    @param --> null
-    @param value --> null
+    @param --> templateId, templateType
+    @param value --> string, string
     description --> delete template
     @return --> null
 */
@@ -257,8 +256,8 @@ func DeleteMessageTemplate(id string,tmpType string) {
 }
 
 /* function for get import history from import history table
-    @param --> null
-    @param value --> null
+    @param --> page
+    @param value --> string
     description --> get import history from import history table
     @return --> import history array
 */
@@ -272,8 +271,8 @@ func GetImportHistory(page string) ([]APIImportHistory, string){
 }
 
 /* function for delete import history from import history table
-    @param --> null
-    @param value --> null
+    @param --> importId
+    @param value --> string
     description --> delete import history from import history table
     @return --> null
 */
@@ -306,7 +305,6 @@ func GetLastImportId() (int){
   ConnectToDatabase()
 	_, c := GetImportHistory("")
   count, _ := strconv.Atoi(c)
-  //lastImportId = len(history)
 	return count
 }
 
@@ -314,7 +312,7 @@ func GetLastImportId() (int){
     @param --> null
     @param value --> null
     description --> get message templates from message template table
-    @return --> message template array
+    @return --> message template array, message template count
 */
 func GetMessageTemplates() ([]APIMessageTemplate, string){
   ConnectToDatabase()
@@ -325,7 +323,7 @@ func GetMessageTemplates() ([]APIMessageTemplate, string){
 }
 
 /* function for get message template from message template table
-    @param --> null
+    @param --> templateId
     @param value --> null
     description --> get message templates from message template table
     @return --> message template array
@@ -351,9 +349,9 @@ func GetLastTemplate() (APITemplateId){
 }
 
 /* Save bulk messages to the database
-    @param --> null
-    @param value --> null
-    description --> save bulk messages to db
+    @param --> bulkType, importId, filterJson, subject, messageJson, url
+    @param value --> string, string, string, string, string, string
+    description --> save bulk messages to db, send message to message controller
     @return --> null
 */
 func SaveBulkMessages(bulkType string, importId string, filterJson string, subject string, messageJson string, url string) {
@@ -386,9 +384,9 @@ func SaveBulkMessages(bulkType string, importId string, filterJson string, subje
 }
 
 /* Save bulk message box to the database
-    @param --> null
-    @param value --> null
-    description --> save bulk messages to db
+    @param --> bulkMessageId, jid, subject, messageBody, url, status
+    @param value --> int, string, string, string, string, string
+    description --> save bulk messages box to db
     @return --> null
 */
 func saveBulkMessagesBox(bulkMessageId int,JId string, subject string, body string, url string, status string) {
@@ -403,7 +401,7 @@ func saveBulkMessagesBox(bulkMessageId int,JId string, subject string, body stri
     @param --> null
     @param value --> null
     description --> get last bulk message id from bulk messages table
-    @return --> message template array
+    @return --> last bulk message
 */
 func GetLastBulkMessageId() (APIBulkMessageId){
   ConnectToDatabase()
@@ -413,10 +411,10 @@ func GetLastBulkMessageId() (APIBulkMessageId){
 }
 
 /* function for get bulk messages from bulk message table
-    @param --> null
-    @param value --> null
+    @param --> page
+    @param value --> string
     description --> get bulk messages from bulk message table
-    @return --> bulk message array
+    @return --> bulk message array, bulk messages count
 */
 func GetBulkMessages(page string) ([]APIBulkMessage, string){
   ConnectToDatabase()
@@ -427,11 +425,11 @@ func GetBulkMessages(page string) ([]APIBulkMessage, string){
 	return bulkMessages, count
 }
 
-/* function for get message template from message template table
-    @param --> null
-    @param value --> null
-    description --> get message templates from message template table
-    @return --> message template array
+/* function for get a bulk message from database
+    @param --> bulkMessageId
+    @param value --> string
+    description --> get a bulk message from database
+    @return --> bulk message 
 */
 func GetBulkMessage(id string) ([]APIBulkMessage2, string){
   ConnectToDatabase()
@@ -442,10 +440,10 @@ func GetBulkMessage(id string) ([]APIBulkMessage2, string){
 }
 
 /* function to get line number from import data table
-    @param --> null
-    @param value --> null
-    description --> get last template from message template table
-    @return --> message template array
+    @param --> importId, filterJson
+    @param value --> string, string
+    description --> get line no for given importId and filterJson
+    @return --> line number
 */
 func getLineNo(importId string, filterJson string) int{
   ConnectToDatabase()
@@ -467,8 +465,8 @@ func getLineNo(importId string, filterJson string) int{
 }
 
 /* function to read filter json
-    @param --> filterJson string
-    @param value --> null
+    @param --> filterJson
+    @param value --> string
     description --> split filterJson to key and value 
     @return --> key and value
 */
@@ -490,11 +488,11 @@ func readFilterJson(filterJson string)(string, string){
 }
 
 
-/* function to get line number from import data table
-    @param --> null
-    @param value --> null
-    description --> get last template from message template table
-    @return --> message template array
+/* function to get value for given key
+    @param --> lineNum, importId, key
+    @param value --> int, string, string
+    description --> get value for given key
+    @return --> value
 */
 func getKeyValue(lineNum int, importId string, key string) string {
   ConnectToDatabase()
@@ -519,7 +517,7 @@ func getKeyValue(lineNum int, importId string, key string) string {
     @param --> import ID
     @param value --> string
     description --> get header list from import history table
-    @return --> header list
+    @return --> header list array
 */
 
 func getHeaderList(importId string) []string {
@@ -548,9 +546,9 @@ func readSubject(subject string)([]string, string){
 }
 
 /* function to make subject
-    @param --> subject string, value string
-    @param value --> null
-    description --> split subject to find key
+    @param --> subject , value 
+    @param value --> string, string
+    description --> make subject including values for keys
     @return --> modified subject
 */
 func makeSubject(subject string, value string)(string){
@@ -563,7 +561,7 @@ func makeSubject(subject string, value string)(string){
 }
 
 /* function to read messageJson 
-    @param --> messageJson string
+    @param --> messageJson
     @param value --> string
     description --> split messageJson to find keys
     @return --> return array of keys
@@ -576,11 +574,11 @@ func readMessagesJson(msgJson string)([]string){
   return msg_arr
 }
 
-/* function to make subject
-    @param --> subject string, value string
-    @param value --> null
-    description --> split subject to find key
-    @return --> modified subject
+/* function to make messageJson
+    @param --> lineNum, importId, messageJson
+    @param value --> int, string, string
+    description --> make messageJson with replacing values for keys
+    @return --> modified messageJson
 */
 func makeMessageJson(lineNum int, importId string, messageJson string)(string){
   var arr[] string
